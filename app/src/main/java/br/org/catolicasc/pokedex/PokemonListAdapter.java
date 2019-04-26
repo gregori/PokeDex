@@ -17,6 +17,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class PokemonListAdapter extends ArrayAdapter {
     private static final String TAG = "PokemonListAdapter";
@@ -64,7 +65,21 @@ public class PokemonListAdapter extends ArrayAdapter {
 
         viewHolder.tvTipo.setText(tipos);
 
-        new DownloadImageTask(viewHolder.ivPokemonImg).execute(pokemonAtual.getImageUrl());
+        try {
+            Bitmap img = null;
+            if (pokemonAtual.getImagem() == null) {
+                img = new DownloadImageTask().execute(pokemonAtual.getImageUrl()).get();
+                pokemonAtual.setImagem(img);
+            } else {
+                img = pokemonAtual.getImagem();
+            }
+            viewHolder.ivPokemonImg.setImageBitmap(img);
+
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         return convertView;
     }
@@ -88,9 +103,9 @@ public class PokemonListAdapter extends ArrayAdapter {
     }
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
-        public DownloadImageTask(ImageView bmImage) {
-            this.bmImage = bmImage;
+        //ImageView bmImage;
+        public DownloadImageTask() {
+        //    this.bmImage = bmImage;
         }
 
         protected Bitmap doInBackground(String... urls) {
@@ -122,9 +137,6 @@ public class PokemonListAdapter extends ArrayAdapter {
                 e.printStackTrace();
             }
             return null;
-        }
-        protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
         }
     }
 }

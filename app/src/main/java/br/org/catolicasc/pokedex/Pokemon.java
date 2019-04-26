@@ -1,5 +1,7 @@
 package br.org.catolicasc.pokedex;
 
+import android.graphics.Bitmap;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +13,7 @@ public class Pokemon {
     private String peso;
     private String altura;
     private List<String> tipo;
+    private Bitmap imagem;
 
     public Pokemon() {
         tipo = new ArrayList<>();
@@ -74,5 +77,13 @@ public class Pokemon {
 
     public void addTipo(String tipo) {
         this.tipo.add(tipo);
+    }
+
+    public Bitmap getImagem() {
+        return imagem;
+    }
+
+    public void setImagem(Bitmap imagem) {
+        this.imagem = imagem;
     }
 }
