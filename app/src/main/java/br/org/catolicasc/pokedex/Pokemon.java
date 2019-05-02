@@ -2,10 +2,11 @@ package br.org.catolicasc.pokedex;
 
 import android.graphics.Bitmap;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Pokemon {
+public class Pokemon implements Serializable {
     private int id;
     private String nome;
     private String numero;

@@ -12,12 +12,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.OkHttpDownloader;
+import com.squareup.picasso.Picasso;
+
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
+
 
 public class PokemonListAdapter extends ArrayAdapter {
     private static final String TAG = "PokemonListAdapter";
@@ -65,21 +67,14 @@ public class PokemonListAdapter extends ArrayAdapter {
 
         viewHolder.tvTipo.setText(tipos);
 
-        try {
-            Bitmap img = null;
-            if (pokemonAtual.getImagem() == null) {
-                img = new DownloadImageTask().execute(pokemonAtual.getImageUrl()).get();
-                pokemonAtual.setImagem(img);
-            } else {
-                img = pokemonAtual.getImagem();
-            }
-            viewHolder.ivPokemonImg.setImageBitmap(img);
 
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        Picasso.with(getContext()).load(pokemonAtual.getImageUrl())
+//                .placeholder(R.drawable.placeholder).into(viewHolder.ivPokemonImg);
+
+        Picasso.Builder builder = new Picasso.Builder(getContext());
+        builder.downloader(new OkHttpDownloader(getContext()));
+        builder.build().load(pokemonAtual.getImageUrl())
+        .placeholder(R.drawable.baseline_image_black_48dp).into(viewHolder.ivPokemonImg);
 
         return convertView;
     }
@@ -102,41 +97,41 @@ public class PokemonListAdapter extends ArrayAdapter {
         }
     }
 
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        //ImageView bmImage;
-        public DownloadImageTask() {
-        //    this.bmImage = bmImage;
-        }
-
-        protected Bitmap doInBackground(String... urls) {
-            URL url = null;
-            try {
-                url = new URL(urls[0]);
-                Bitmap bmp = null;
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.connect();
-
-                int resposta = connection.getResponseCode();
-                Log.d(TAG, "downloadJson: O código de resposta foi: " + resposta);
-
-                if (resposta != HttpURLConnection.HTTP_OK) { // se resposta não foi OK
-                    if (resposta == HttpURLConnection.HTTP_MOVED_TEMP  // se for um redirect
-                            || resposta == HttpURLConnection.HTTP_MOVED_PERM
-                            || resposta == HttpURLConnection.HTTP_SEE_OTHER) {
-                        // pegamos a nova URL e abrimos nova conexão!
-                        String novaUrl = connection.getHeaderField("Location");
-                        connection = (HttpURLConnection) new URL(novaUrl).openConnection();
-                    }
-                }
-
-                InputStream inputStream = connection.getInputStream();
-
-                return BitmapFactory.decodeStream(inputStream);
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
-            }
-            return null;
-        }
-    }
+//    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+//        //ImageView bmImage;
+//        public DownloadImageTask() {
+//        //    this.bmImage = bmImage;
+//        }
+//
+//        protected Bitmap doInBackground(String... urls) {
+//            URL url = null;
+//            try {
+//                url = new URL(urls[0]);
+//                Bitmap bmp = null;
+//                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//                connection.connect();
+//
+//                int resposta = connection.getResponseCode();
+//                Log.d(TAG, "downloadJson: O código de resposta foi: " + resposta);
+//
+//                if (resposta != HttpURLConnection.HTTP_OK) { // se resposta não foi OK
+//                    if (resposta == HttpURLConnection.HTTP_MOVED_TEMP  // se for um redirect
+//                            || resposta == HttpURLConnection.HTTP_MOVED_PERM
+//                            || resposta == HttpURLConnection.HTTP_SEE_OTHER) {
+//                        // pegamos a nova URL e abrimos nova conexão!
+//                        String novaUrl = connection.getHeaderField("Location");
+//                        connection = (HttpURLConnection) new URL(novaUrl).openConnection();
+//                    }
+//                }
+//
+//                InputStream inputStream = connection.getInputStream();
+//
+//                return BitmapFactory.decodeStream(inputStream);
+//            } catch (Exception e) {
+//                Log.e("Error", e.getMessage());
+//                e.printStackTrace();
+//            }
+//            return null;
+//        }
+//    }
 }
